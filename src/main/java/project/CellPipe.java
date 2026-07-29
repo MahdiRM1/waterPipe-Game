@@ -11,7 +11,7 @@ public class CellPipe{
 
     private final int row;
     private final int col;
-    public final int TILE_SIZE;
+    public final double TILE_SIZE;
     private Button btn;
     private ImageView image;
     private int type;   
@@ -25,13 +25,13 @@ public class CellPipe{
 
         switch (gameUi.getLevel()) {
             case 1:
-                TILE_SIZE = 150;
+                TILE_SIZE = Constants.SCREEN_WIDTH/12.8;
                 break;
             case 2:
-                TILE_SIZE = 130;
+                TILE_SIZE = Constants.SCREEN_WIDTH/15.36;
                 break;
             default:
-                TILE_SIZE = 110;
+                TILE_SIZE = Constants.SCREEN_WIDTH/19.2;
         }
         row = Row;
         col = Col;
@@ -79,12 +79,11 @@ public class CellPipe{
     }
 
     private void setImage(){
-
-        if(canRotate) image = new ImageView(new Image("file:pictures/" + type + ".png"));
-        else image = new ImageView(new Image("file:pictures/" + type + ".5.png"));
-        image.setFitHeight(TILE_SIZE);
-        image.setFitWidth(TILE_SIZE);
-        
+        if (type == 0) image = new ImageView();
+        else {
+            String str = canRotate ? (type + ".png") : type + ".5.png";
+            image = ImageFactory.createImageView(str, TILE_SIZE, TILE_SIZE);
+        }
     }
 
     //----------------------------------------------------------

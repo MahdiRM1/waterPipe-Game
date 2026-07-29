@@ -17,8 +17,6 @@ import javafx.stage.Stage;
 
 public class LevelSelection {
     private final Stage stage;
-    int width = (int)Screen.getPrimary().getBounds().getWidth();
-    int height = (int)Screen.getPrimary().getBounds().getHeight();
 
     public LevelSelection(Stage stage) {
         this.stage = stage;
@@ -27,9 +25,8 @@ public class LevelSelection {
     public void show() {
 
         BorderPane pane = new BorderPane();
-                ImageView image = new ImageView(new Image("file:pictures/levelselection.png"));
-        image.setFitHeight(height);
-        image.setFitWidth(width);
+        ImageView image = ImageFactory.createImageView("levelselection.png",
+                Constants.SCREEN_WIDTH, Constants.SCREEN_HEIGHT);
         HBox root = new HBox(50);
         root.setAlignment(Pos.CENTER);
 
@@ -47,7 +44,7 @@ public class LevelSelection {
         pane.setCenter(root);
         pane.setTop(selectionBox);
 
-        Scene scene = new Scene(pane, width, height);
+        Scene scene = new Scene(pane, Constants.SCREEN_WIDTH, Constants.SCREEN_HEIGHT);
         stage.setScene(scene);
         stage.setTitle("Select Level");
         stage.show();
@@ -55,7 +52,7 @@ public class LevelSelection {
 
     public void startGame(int level) {
         GameUI gameUI = new GameUI(level, stage);
-        Scene gameScene = new Scene(gameUI.getPane(), gameUI.getWidth(), gameUI.getHeight());
+        Scene gameScene = new Scene(gameUI.getPane(), Constants.SCREEN_WIDTH, Constants.SCREEN_HEIGHT);
         stage.setTitle("WaterPipe Game");
         stage.setScene(gameScene);
     }
