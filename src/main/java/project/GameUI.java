@@ -1,19 +1,19 @@
 package project;
 
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.geometry.Pos;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.effect.DropShadow;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 import project.CellPipe.Rotation;
 
 public class GameUI {
@@ -21,6 +21,7 @@ public class GameUI {
     private final Board board;
     private final int ROWS;
     private final int COLS;
+    private final StackPane stackPane = new StackPane();
     private final BorderPane gamePane = new BorderPane();
     private final Stage stage;
     private int level;
@@ -42,7 +43,7 @@ public class GameUI {
 
         int[][] boardValue;
         switch (level) {
-            case 1:{
+            case 1 -> {
                 ROWS = 5; COLS = 5;
                 boardValue = new int[][]{
                 {7, 0, 0, 0, 0},
@@ -51,11 +52,10 @@ public class GameUI {
                 {1, 0, 0, 0, 0},
                 {3, 2, 2, 2, 8}
                 };
-                board = new Board(ROWS, COLS, boardValue, this, scoreboard);      
-                break; 
+                board = new Board(ROWS, COLS, boardValue, this, scoreboard);
             }
 
-            case 2:{
+            case 2 -> {
                 ROWS = 7; COLS = 7;
                 boardValue = new int[][]{
                 {7, 0, 0, 0, 0, 0, 0}, 
@@ -67,9 +67,8 @@ public class GameUI {
                 {0, 3, 2, 2, 2, 2, 8}
                 };
                 board = new Board(ROWS, COLS, boardValue, this, scoreboard);
-                break;
             }
-            default:{
+            default -> {
                 ROWS = 8; COLS = 8;
                 boardValue = new int[][]{
                 {0, 7, 0, 3, 2, 2, 3, 0}, 
@@ -82,13 +81,13 @@ public class GameUI {
                 {0, 0, 3, 1, 3, 0, 0, 0}
                 };
                 board = new Board(ROWS, COLS, boardValue, this, scoreboard);
-                break;
             }
         }
         GridPane gridPane = new GridPane();
         initializeUi(gridPane);
-        if(winCheck(board.getFirstPipeRow(), board.getFirstPipeCol(), board.getFirstPipeRow() + 1, board.getFirstPipeCol())) new LevelSelection(stage).startGame(level);
-
+        if(winCheck(board.getFirstPipeRow(), board.getFirstPipeCol(),
+                board.getFirstPipeRow() + 1, board.getFirstPipeCol())) new LevelSelection(stage).startGame(level);
+        stackPane.getChildren().add(gamePane);
     }
 
     //----------------------------------------------------------
@@ -121,9 +120,13 @@ public class GameUI {
         Button settingBtn = setButton("setting", BTN_SIDE, BTN_SIDE, 0);
         Button restartBtn = setButton("restart", BTN_SIDE, BTN_SIDE, 0);
         
-        homeBtn.setOnAction(event -> new LevelSelection(stage).show());
+        homeBtn.setOnAction(event -> {
+            SoundManager.playClick();
+            new LevelSelection(stage).show();
+        });
         restartBtn.setOnAction(event -> {
             scoreboard.stoptime();
+            SoundManager.playClick();
             new LevelSelection(stage).startGame(level);
         }
         );
@@ -159,7 +162,7 @@ public class GameUI {
     //----------------------------------------------------------
 
     private void Undo(){
-
+        SoundManager.playClick();
         if(move[1].Rotation() == null || scoreboard.remainUndo() < 1) return;
 
         if(move[1].Rotation() == Rotation.Clockwise) board.getCell(move[1].Row(), move[1].Col()).rotate(Rotation.Counterclockwise);
@@ -170,7 +173,7 @@ public class GameUI {
         if(scoreboard.remainUndo() < 1 || move[1].Rotation() == null) UndoBtn(false);
     }
 
-    private Button setButton(String text, int width, int height, int fontsize){
+    private Button setButton(String text, double width, double height, double fontsize){
         Button btn = new Button();
         if(fontsize == 0) {
             ImageView image = ImageFactory.createImageView(text + ".png",
@@ -186,10 +189,13 @@ public class GameUI {
             "-fx-text-fill: white; " +     
             "-fx-font-size: %dpx; " +
             "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.8), 10, 0.5, 0, 1);" ,
-                BTN_SIDE, width, height, fontsize
+                BTN_SIDE, (int)width, (int)height, (int)fontsize
             ));
 
-        btn.setOnMouseEntered(e -> btn.setStyle(btn.getStyle() + "-fx-background-color: linear-gradient(to bottom, rgb(55, 202, 247), #0f2fe4);"));
+        btn.setOnMouseEntered(e -> {
+            SoundManager.playHover();
+            btn.setStyle(btn.getStyle() + "-fx-background-color: linear-gradient(to bottom, rgb(55, 202, 247), #0f2fe4);");
+        });
         btn.setOnMouseExited(e -> btn.setStyle(btn.getStyle() + "-fx-background-color: linear-gradient(to bottom, #0f2fe4,rgb(55, 202, 247));"));
 
         return btn;
@@ -252,64 +258,122 @@ public class GameUI {
 
     public void showWinMessage(){
         scoreboard.stoptime();
-        
-        Label winLabel = new Label("You Win!");
-        winLabel.setTextFill(Color.GREEN);
-        winLabel.setFont(Font.font("Arial", FontWeight.BOLD, BTN_SIDE));
-        winLabel.setEffect(new DropShadow((double) BTN_SIDE /10, Color.BLACK));
+        SoundManager.playWin();
+        Pane pane = new Pane();
 
-        Button backToMenu = setButton("Back to menu", BTN_SIDE *7/5, BTN_SIDE, BTN_SIDE*3/10);
-        backToMenu.setOnAction(event -> new LevelSelection(stage).show());
+        ImageView winPic = ImageFactory.createImageView("win.png",
+                Constants.SCREEN_WIDTH/8, Constants.SCREEN_WIDTH/12);
+        ImageFactory.setNodePosition(winPic,
+                Constants.SCREEN_WIDTH/3, Constants.SCREEN_HEIGHT/3);
 
-        Button nextLevel = setButton("Next level", BTN_SIDE *7/5, BTN_SIDE, BTN_SIDE*3/10);
-        nextLevel.setOnAction(event -> new LevelSelection(stage).startGame(++level));
-
-        VBox winBox = new VBox((double) BTN_SIDE /10);
-        if(level < 3) winBox.getChildren().addAll(winLabel, backToMenu, nextLevel);
-        else winBox.getChildren().addAll(winLabel, backToMenu);
-        winBox.setAlignment(Pos.CENTER);
-        winBox.setStyle("-fx-background-color: rgba(174, 255, 174, 0.7);");
-        editBox(winBox);
+        pane.getChildren().add(winPic);
+        stackPane.getChildren().add(pane);
+        finishAnimation(winPic, "win");
     }
 
-    private void editBox(VBox box) {
-        box.setPrefSize(Constants.SCREEN_WIDTH, Constants.SCREEN_HEIGHT);
+    private void winPane(){
+        Pane pane = (Pane) stackPane.getChildren().getLast();
 
-        StackPane winPane = new StackPane();
-        winPane.getChildren().addAll(gamePane, box);
-        Scene scene = new Scene(winPane, Constants.SCREEN_WIDTH, Constants.SCREEN_HEIGHT);
-        stage.setScene(scene);
-        stage.show();
+        Button backToMenu = setButton("Back to menu", Constants.SCREEN_WIDTH/5, BTN_SIDE, BTN_SIDE*3/10);
+        backToMenu.setOnAction(event -> {
+            SoundManager.playClick();
+            new LevelSelection(stage).show();
+        });
+        ImageFactory.setNodePosition(backToMenu, Constants.SCREEN_WIDTH/4, Constants.SCREEN_HEIGHT/1.5);
+
+        Button nextLevel = setButton("Next level", Constants.SCREEN_WIDTH/5, BTN_SIDE, BTN_SIDE*3/10);
+        nextLevel.setOnAction(event -> {
+            SoundManager.playClick();
+            new LevelSelection(stage).startGame(++level);
+        });
+        ImageFactory.setNodePosition(nextLevel, Constants.SCREEN_WIDTH*0.55, Constants.SCREEN_HEIGHT/1.5);
+
+        Button restartLevel = setButton("Restart level", Constants.SCREEN_WIDTH/5, BTN_SIDE, BTN_SIDE*3/10);
+        restartLevel.setOnAction(event -> {
+            SoundManager.playClick();
+            new LevelSelection(stage).startGame(level);
+        });
+        ImageFactory.setNodePosition(restartLevel, Constants.SCREEN_WIDTH*0.55, Constants.SCREEN_HEIGHT/1.5);
+
+        if(level < 3) pane.getChildren().addAll(backToMenu, nextLevel);
+        else pane.getChildren().addAll(backToMenu, restartLevel);
+
+        pane.setStyle("-fx-background-color: rgba(174, 255, 174, 0.7);");
+        stackPane.getChildren().add(pane);
     }
 
-    public void showLoseMessage(String message){    
-        Label loseLabel = new Label("You Lose!");
-        loseLabel.setTextFill(Color.RED);
-        loseLabel.setFont(Font.font("Arial", FontWeight.BOLD, BTN_SIDE));
-        loseLabel.setEffect(new DropShadow((double) BTN_SIDE /10, Color.BLACK));
+    public void showLoseMessage(String message){
+        scoreboard.stoptime();
+        SoundManager.playLose();
+        Pane pane = new Pane();
+
+        ImageView winPic = ImageFactory.createImageView("lose.png",
+                Constants.SCREEN_WIDTH/8, Constants.SCREEN_WIDTH/12);
+        ImageFactory.setNodePosition(winPic,
+                Constants.SCREEN_WIDTH/3, Constants.SCREEN_HEIGHT/3);
+
+        pane.getChildren().add(winPic);
+        stackPane.getChildren().add(pane);
+        finishAnimation(winPic, message);
+    }
+
+    private void losePane(String message){
+        Pane pane = (Pane) stackPane.getChildren().getLast();
 
         Label messageLabel = new Label(message);
         messageLabel.setTextFill(Color.BLACK);
         messageLabel.setFont(Font.font("Arial", (double) BTN_SIDE /2));
         messageLabel.setEffect(new DropShadow((double) BTN_SIDE /20, Color.BLACK));
-        
+        ImageFactory.setNodePosition(messageLabel,
+                message.contains("up") ? Constants.SCREEN_WIDTH*0.4 : Constants.SCREEN_WIDTH*0.37,
+                Constants.SCREEN_HEIGHT/1.7);
 
-        Button backToMenu = setButton("Back to menu", BTN_SIDE *7/5, BTN_SIDE, BTN_SIDE*3/10);
-        backToMenu.setOnAction(event -> new LevelSelection(stage).show());
+        Button backToMenu = setButton("Back to menu", Constants.SCREEN_WIDTH/5, BTN_SIDE, BTN_SIDE*3/10);
+        backToMenu.setOnAction(event -> {
+            SoundManager.playClick();
+            new LevelSelection(stage).show();
+        });
+        ImageFactory.setNodePosition(backToMenu, Constants.SCREEN_WIDTH*0.25, Constants.SCREEN_HEIGHT/1.4);
 
-        VBox loseBox = new VBox((double) BTN_SIDE /10);
-        loseBox.getChildren().addAll(loseLabel, messageLabel, backToMenu);
-        loseBox.setAlignment(Pos.CENTER);
-        loseBox.setStyle("-fx-background-color: rgba(255, 174, 174, 0.7);");
-        editBox(loseBox);
+        Button restartLevel = setButton("Restart level", Constants.SCREEN_WIDTH/5, BTN_SIDE, BTN_SIDE*3/10);
+        restartLevel.setOnAction(event -> {
+            SoundManager.playClick();
+            new LevelSelection(stage).startGame(level);
+        });
+        ImageFactory.setNodePosition(restartLevel, Constants.SCREEN_WIDTH*0.55, Constants.SCREEN_HEIGHT/1.4);
+
+        pane.getChildren().addAll(messageLabel, backToMenu, restartLevel);
+        pane.setStyle("-fx-background-color: rgba(255, 174, 174, 0.7);");
+        stackPane.getChildren().add(pane);
+    }
+
+    private void finishAnimation(ImageView image, String cond){
+        image.setOnMouseEntered(e -> {});
+        image.setOnMouseClicked(e -> {});
+        double sizeH = image.getFitHeight();
+        double sizeW = image.getFitWidth();
+        double diffX = image.getLayoutX() - Constants.SCREEN_WIDTH/4;
+        double diffY = image.getLayoutY() - Constants.SCREEN_HEIGHT/10;
+        Timeline timeline = new Timeline(new KeyFrame(Duration.millis(20), e ->{
+            image.setFitWidth(image.getFitWidth() + (sizeW / 50));
+            image.setFitHeight(image.getFitHeight() + (sizeH / 50));
+            image.setLayoutX(image.getLayoutX() - (diffX / 150));
+            image.setLayoutY(image.getLayoutY() - (diffY / 150));
+        }));
+        timeline.setCycleCount(150);
+        timeline.setOnFinished(e -> {
+            if ("win".equals(cond))winPane();
+            losePane(cond);
+        });
+        timeline.play();
     }
 
     //----------------------------------------------------------
     //-----------------------getters----------------------------
     //----------------------------------------------------------
 
-    public BorderPane getPane() {
-        return gamePane;
+    public Pane getPane() {
+        return stackPane;
     }
 
     public Board getBoard() {

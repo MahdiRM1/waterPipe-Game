@@ -59,7 +59,10 @@ public class LevelSelection {
 
     private Button setButton(int level){
         Button btn = new Button("" + level);
-        btn.setOnAction(event -> startGame(level)); 
+        btn.setOnAction(event -> {
+            SoundManager.playClick();
+            startGame(level);
+        });
         btn.setStyle(
             "-fx-background-radius: 50; " + 
             "-fx-min-width: 150px; " +    
@@ -70,7 +73,10 @@ public class LevelSelection {
             "-fx-font-weight: bold; " +
             "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.8), 10, 0.5, 0, 1);"
         );
-        btn.setOnMouseEntered(e -> btn.setStyle(btn.getStyle() + "-fx-background-color: linear-gradient(to bottom,rgb(55, 202, 247),  #0f2fe4);"));
+        btn.setOnMouseEntered(e -> {
+            SoundManager.playHover();
+            btn.setStyle(btn.getStyle() + "-fx-background-color: linear-gradient(to bottom,rgb(55, 202, 247),  #0f2fe4);");
+        });
         btn.setOnMouseExited(e -> btn.setStyle(btn.getStyle() + "-fx-background-color: linear-gradient(to bottom, #0f2fe4,rgb(55, 202, 247));"));
         return btn;
     }

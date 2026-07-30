@@ -2,7 +2,6 @@ package project;
 
 import javafx.animation.RotateTransition;
 import javafx.scene.control.Button;
-import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseButton;
 import javafx.util.Duration;
@@ -12,9 +11,9 @@ public class CellPipe{
     private final int row;
     private final int col;
     public final double TILE_SIZE;
-    private Button btn;
-    private ImageView image;
-    private int type;   
+    private final Button btn = new Button();
+    private final ImageView image;
+    private int type;
     private final boolean canRotate;
     private final GameUI gameUi;
     private final ScoreBoard scoreboard;
@@ -39,9 +38,8 @@ public class CellPipe{
         this.type = type;
         scoreboard = scoreBoard;
         canRotate = canrotate;
-        setImage();
+        image = setImage();
         initializeButton();
-
     }
 
     //----------------------------------------------------------
@@ -49,41 +47,57 @@ public class CellPipe{
     //----------------------------------------------------------
 
     private void initializeButton(){
-        btn = new Button();
         btn.setPrefSize(TILE_SIZE, TILE_SIZE);
         btn.setGraphic(image);
         btn.setStyle("-fx-background-color: transparent; -fx-border-width: 0;");
-        btn.setOnMouseClicked(event -> {
-            if(type > 0 && type < 7){
-                if(canRotate){
-                    if(event.getButton() == MouseButton.PRIMARY) {
-                        rotate(Rotation.Clockwise);
-                        gameUi.setMove(row, col, Rotation.Clockwise);
-                    }
-                    else {
-                        rotate(Rotation.Counterclockwise);
-                        gameUi.setMove(row, col, Rotation.Counterclockwise);
-                    }
-                }
-                int firstRow = gameUi.getBoard().getFirstPipeRow();
-                int firstCol = gameUi.getBoard().getFirstPipeCol();
-                if(gameUi.winCheck(firstRow, firstCol, firstRow + 1, firstCol)){
-                   gameUi.showWinMessage();
-                }
-                else if(scoreboard.getmove() < 1){
-                    scoreboard.stoptime();
-                    gameUi.showLoseMessage("Your moves are over!");
-                }
-            }
-        });
+        btn.setOnMouseClicked(event -> clickAction(event.getButton()));
+        initRotate();
     }
 
-    private void setImage(){
-        if (type == 0) image = new ImageView();
-        else {
-            String str = canRotate ? (type + ".png") : type + ".5.png";
-            image = ImageFactory.createImageView(str, TILE_SIZE, TILE_SIZE);
+    private void clickAction(javafx.scene.input.MouseButton mb){
+        if(type > 0 && type < 7){
+            if(canRotate){
+                if(mb == MouseButton.PRIMARY) {
+                    rotate(Rotation.Clockwise);
+                    gameUi.setMove(row, col, Rotation.Clockwise);
+                }
+                else {
+                    rotate(Rotation.Counterclockwise);
+                    gameUi.setMove(row, col, Rotation.Counterclockwise);
+                }
+            }
+            int firstRow = gameUi.getBoard().getFirstPipeRow();
+            int firstCol = gameUi.getBoard().getFirstPipeCol();
+            if(gameUi.winCheck(firstRow, firstCol, firstRow + 1, firstCol)){
+                gameUi.showWinMessage();
+            }
+            else if(scoreboard.getmove() < 1){
+                scoreboard.stoptime();
+                gameUi.showLoseMessage("Your moves are over!");
+            }
         }
+    }
+
+    private void initRotate(){
+        RotateTransition rotateTransition = new RotateTransition(Duration.millis(1), btn);
+        int rotate = switch (type){
+            case 2, 4 -> 90;
+            case 5    -> 180;
+            case 6    -> -90;
+            default   -> 0;
+        };
+        rotateTransition.setByAngle(rotate);
+        rotateTransition.play();
+    }
+
+    private ImageView setImage(){
+        if (type == 0) return new ImageView();
+        String str = switch (type){
+            case 1, 2       -> canRotate ? "1.png" : "1.5.png";
+            case 3, 4, 5, 6 -> canRotate ? "3.png" : "3.5.png";
+            default         -> canRotate ? (type + ".png") : type + ".5.png";
+        };
+        return ImageFactory.createImageView(str, TILE_SIZE, TILE_SIZE);
     }
 
     //----------------------------------------------------------
@@ -92,7 +106,11 @@ public class CellPipe{
 
     public void rotate(Rotation rotation){
 
-        if(!canRotate) return;
+        if(!canRotate) {
+            SoundManager.playError();
+            return;
+        }
+        SoundManager.playRotate();
         RotateTransition rotateTransition = new RotateTransition(Duration.millis(100), btn);
         
         if(rotation == Rotation.Clockwise){ 
@@ -110,42 +128,21 @@ public class CellPipe{
     }
 
     private void clockwiseRotate(){
-
-        switch (type) {
-
-            case 0:
-            case 7:
-            case 8:break;
-
-            case 2: 
-                type = 1;
-                break;
-            case 6:
-                type = 3;
-                break;    
-
-            default: type++;    
-
-        }
+        type = switch (type) {
+            case 0, 7, 8 -> type;
+            case 2 -> 1;
+            case 6 -> 3;
+            default -> type+1;
+        };
     }
 
     private void counterclockwiseRotate(){
-
-        switch (type) {
-
-            case 0:
-            case 7:
-            case 8:break;
-
-            case 1: 
-                type = 2;
-                break;
-            case 3:
-                type = 6;
-                break;    
-
-            default: type--;    
-        }
+        type = switch (type) {
+            case 0, 7, 8 -> type;
+            case 1 -> 2;
+            case 3 -> 6;
+            default -> type-1;
+        };
     }
 
     //----------------------------------------------------------
@@ -155,7 +152,6 @@ public class CellPipe{
     public int getType() {
         return type;
     }
-
 
     public Button getButton(){
         return btn;
