@@ -80,32 +80,3 @@ src/
 │   └── resources/
 └── test/
 ```
-
----
-
-# 🚀 Running from Source
-
-```bash
-git clone https://github.com/YOUR_USERNAME/WaterPipeGame.git
-
-cd WaterPipeGame
-
-mvn javafx:run
-```
-
----
-
-# 🗺️ Roadmap
-
-- [ ] More levels
-- [ ] Level editor
-- [ ] Hint system
-- [ ] Save & Load progress
-- [ ] Achievements
-- [ ] Leaderboards
-
----
-
-# 📄 License
-
-This project is licensed under the **GPL-3.0 License**.
