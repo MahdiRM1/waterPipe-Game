@@ -62,8 +62,19 @@
                 <groupId>org.openjfx</groupId>
                 <artifactId>javafx-maven-plugin</artifactId>
                 <version>0.0.8</version>
+
                 <configuration>
                     <mainClass>project.WaterPipe</mainClass>
+
+                    <launcher>WaterPipeGame</launcher>
+
+                    <jlinkImageName>WaterPipeGame</jlinkImageName>
+
+                    <jlinkZipName>WaterPipeGame</jlinkZipName>
+
+                    <stripDebug>true</stripDebug>
+                    <noHeaderFiles>true</noHeaderFiles>
+                    <noManPages>true</noManPages>
                 </configuration>
             </plugin>
         </plugins>
