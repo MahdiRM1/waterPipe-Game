@@ -1,5 +1,17 @@
-.git
-.idea
-.vscode
-.git
-target
+# Build output
+target/
+
+# IDE
+.idea/
+.vscode/
+*.iml
+.classpath
+.project
+.settings/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log

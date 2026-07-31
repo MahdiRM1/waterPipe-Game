@@ -6,12 +6,10 @@ import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.effect.DropShadow;
-import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
-import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import project.CellPipe.Rotation;
@@ -362,8 +360,11 @@ public class GameUI {
         }));
         timeline.setCycleCount(150);
         timeline.setOnFinished(e -> {
-            if ("win".equals(cond))winPane();
-            losePane(cond);
+            if ("win".equals(cond)) {
+                winPane();
+            } else {
+                losePane(cond);
+            }
         });
         timeline.play();
     }
