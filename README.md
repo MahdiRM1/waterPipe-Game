@@ -1,52 +1,111 @@
-# WaterPipe
+<p align="center">
+  <img src="screenshots/gameplay.gif" width="900">
+</p>
 
-A desktop puzzle game built with JavaFX. Rotate the pipes on the board to connect
-the water source to the destination before you run out of moves or time.
+<h1 align="center">💧 WaterPipe Game</h1>
 
-## Features
+<p align="center">
+A modern JavaFX implementation of the classic Water Pipe Puzzle game.
+Rotate the pipes, connect the water source to the destination, and solve increasingly challenging levels.
+</p>
 
-- 3 levels of increasing difficulty
-- Click-to-rotate pipe pieces with a flowing-water animation on success
-- Move counter, timer, and undo support
-- Sound effects for clicks, hover, rotation, win, and lose
+---
 
-## Requirements
+## ✨ Features
 
-- JDK 21+
-- Apache Maven 3.8+
+- 🎮 Multiple handcrafted levels
+- 🔄 Rotate pipes to complete the pipeline
+- ⏱️ Real-time timer
+- 📊 Move counter
+- ↩️ Undo moves
+- 🔁 Restart level
+- 🏠 Home menu
+- ⚙️ Settings menu
+- 🔊 Sound effects
+- 🎨 Cartoon-style graphics
+- 🚀 Built with JavaFX 21
 
-## Running the game
+---
+
+# 📸 Screenshots
+
+## Level Selection
+
+<p align="center">
+    <img src="screenshots/level-select.png" width="850">
+</p>
+
+## Gameplay
+
+<p align="center">
+    <img src="screenshots/gameplay.png" width="850">
+</p>
+
+---
+
+# 🎮 How to Play
+
+- Click on a pipe to rotate it.
+- Connect the water source to the destination.
+- Complete the pipeline before the timer runs out.
+- Try to solve each puzzle with the fewest possible moves.
+
+---
+
+# 📥 Download
+
+Download the latest version from the **Releases** page.
+
+➡️ **https://github.com/YOUR_USERNAME/WaterPipeGame/releases/latest**
+
+Simply download the installer and follow the installation steps.
+
+---
+
+# 🛠️ Built With
+
+- Java 21
+- JavaFX 21
+- Maven
+- JPackage
+
+---
+
+# 📂 Project Structure
+
+```
+src/
+├── main/
+│   ├── java/
+│   └── resources/
+└── test/
+```
+
+---
+
+# 🚀 Running from Source
 
 ```bash
-mvn clean javafx:run
+git clone https://github.com/YOUR_USERNAME/WaterPipeGame.git
+
+cd WaterPipeGame
+
+mvn javafx:run
 ```
 
-## Building a jar
+---
 
-```bash
-mvn clean package
-```
+# 🗺️ Roadmap
 
-## Project structure
+- [ ] More levels
+- [ ] Level editor
+- [ ] Hint system
+- [ ] Save & Load progress
+- [ ] Achievements
+- [ ] Leaderboards
 
-```
-src/main/java/project/
-├── WaterPipe.java       # Application entry point
-├── LevelSelection.java  # Level select screen
-├── GameUI.java          # In-game screen, win/lose panes, animations
-├── Board.java           # Grid/puzzle state
-├── CellPipe.java        # Single pipe cell: type, rotation, connections
-├── Move.java            # Records a single rotation move (for undo)
-├── ScoreBoard.java       # Move counter and timer
-├── ImageFactory.java    # Image loading/positioning helpers
-├── SoundManager.java    # Sound effect playback
-└── Constants.java       # Screen size constants
+---
 
-src/main/resources/
-├── Pictures/            # Sprites and UI images
-└── Audio/                # Sound effects
-```
+# 📄 License
 
-## License
-
-MIT — see [LICENSE](LICENSE).
+This project is licensed under the **GPL-3.0 License**.
